@@ -17,7 +17,7 @@ resource "azurerm_virtual_network" "main" {
 }
 resource "azurerm_subnet" "interanl" {
   name = "internal"
-  resourec_group_name = azurerm_resource_group.main.name
+  resource_group_name = azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes = ["150.0.1.0/24"]
 }
@@ -27,7 +27,7 @@ resource "azurerm_network_interface" "main" {
   resourec_group_name = azurerm_resource_group.main.name
   ip_configuration {
     name = "wooc"
-    subnet_id = azurerm_subnet.internal.id
+    subnet_id = azurerm_subnet.interanl.id
     private_ip_address_allocation = "Dynamic"
 
   }
