@@ -20,7 +20,7 @@ resource "azurerm_subnet" "li_sub" {
 }
 resource "azurerm_network_interface" "li_nic" {
     count = var.node_count
-    name = "${var.resoruce_prefix}-${format("%02d",count.index)}-NIC"
+    name = "${var.resource_prefix}-${format("%02d",count.index)}-NIC"
     location = var.node_location
     resource_group_name = azurerm_resource_group.li_rg.name
     ip_configuration {
@@ -31,7 +31,7 @@ resource "azurerm_network_interface" "li_nic" {
 }
 
 resource "azurerm_network_security_group" "li_nsg" {
-    name = "${var.resoruce_prefix}-nsg"
+    name = "${var.resource_prefix}-nsg"
     loaction = azurerm_resource_group.li_rg.location
     resource_group_name = azurerm_resource_group.li_rg.name
     security_rule {
@@ -53,7 +53,7 @@ resource "azurerm_subnet_network_security_group_association" "li_subnet_nsg_asso
 }
 resource "azurerm_virtual_machine" "li-vm" {
     count = var.node_count
-    name = "${var.resoruce_prefix}-${format("%02d",count.index)}"
+    name = "${var.resource_prefix}-${format("%02d",count.index)}"
     location = azurerm_resource_group.li_rg.location
     resource_group_name = azurerm_resource_group.li_rg.name
     network_interface_ids = [element(azurerm_network_interface.li_nic.*.id, count.index)]
