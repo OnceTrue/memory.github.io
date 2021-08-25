@@ -1,10 +1,10 @@
-provider azurerm {
+provider "azurerm" {
     subscription_id = "801d5b45-4c84-4353-a1ce-213384a016aa"
     version = "~>2.0"
         features {}
 }
 resource "azurerm_resource_group" "li_rg" {
-    name "${var.resoruce_prefix}-RG"
+    name = "${var.resoruce_prefix}-RG"
     location = var.node_location
 }
 resource "azurerm_virtual_network" "li_vnet" {
@@ -14,12 +14,12 @@ resource "azurerm_virtual_network" "li_vnet" {
     address_space = var.node_address_space
 }
 resource "azurerm_subnet" "li_sub" {
-    name = ${var.resource_prefix}-sub"
+    name = "${var.resource_prefix}-sub"
     resource_group_name = azurerm_resource_group.li_rg.name
     virtual_network_name = azurerm_virtual_network.li_vnet.name
     address_prefix = var.node_address_prefix
 }
-resource "azurerm_network_interface" "li_nic {
+resource "azurerm_network_interface" "li_nic" {
     count = var.node_count
     name = "${var.resoruce_prefix}-${format("%02d",count.index)}-NIC"
     location = var.node_location
