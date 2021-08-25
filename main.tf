@@ -3,7 +3,7 @@ provider "azurerm" {
         features {}
 }
 resource "azurerm_resource_group" "li_rg" {
-    name = "${var.resoruce_prefix}-RG"
+    name = "${var.resource_prefix}-RG"
     location = var.node_location
 }
 resource "azurerm_virtual_network" "li_vnet" {
