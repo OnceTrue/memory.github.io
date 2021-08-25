@@ -32,16 +32,16 @@ resource "azurerm_network_interface" "li_nic" {
 
 resource "azurerm_network_security_group" "li_nsg" {
     name = "${var.resource_prefix}-nsg"
-    loaction = azurerm_resource_group.li_rg.location
+    location = azurerm_resource_group.li_rg.location
     resource_group_name = azurerm_resource_group.li_rg.name
     security_rule {
         name = "Inbound"
         priority = 100
         direction = "Inbound"
         access = "Allow"
-        protocol = "SSH"
+        protocol = "Tcp"
         source_port_range = "*"
-        destination_port_range = "*"
+        destination_port_range = "22"
         source_address_prefix = "*"
         destination_address_prefix = "*"
     }
@@ -60,7 +60,7 @@ resource "azurerm_virtual_machine" "li-vm" {
     vm_size = "Standard_B1s"
     delete_os_disk_on_termination = true
     storage_image_reference {
-        publisher = "UbuntuServer"
+        publisher = "Canonical"
         offer = "UbuntuServer"
         sku = "16.04-LTS"
         version = "latest" 
