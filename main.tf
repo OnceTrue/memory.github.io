@@ -32,7 +32,7 @@ resource "azurerm_network_interface" "li_nic" {
 
 resource "azurerm_network_security_group" "li_nsg" {
     name = "${var.resource_prefix}-nsg"
-    location = azurerm_resource_group.li_rg.location
+    location = var.node_location
     resource_group_name = azurerm_resource_group.li_rg.name
     security_rule {
         name = "Inbound"
@@ -54,7 +54,7 @@ resource "azurerm_subnet_network_security_group_association" "li_subnet_nsg_asso
 resource "azurerm_virtual_machine" "li-vm" {
     count = var.node_count
     name = "${var.resource_prefix}-${format("%02d",count.index)}"
-    location = azurerm_resource_group.li_rg.location
+    location = var.node_location
     resource_group_name = azurerm_resource_group.li_rg.name
     network_interface_ids = [element(azurerm_network_interface.li_nic.*.id, count.index)]
     vm_size = "Standard_B1s"
@@ -79,4 +79,38 @@ resource "azurerm_virtual_machine" "li-vm" {
     os_profile_linux_config {
         disable_password_authentication = false
     }
+}
+
+resource "azurerm_public_ip" "li_pip" {
+    name = "LB-Pip"
+    location = var.node_location
+    resource_group_name = azurerm_resource_group.li_rg.name
+    allocation_method = "Static"
+    sku = "standard"
+}
+
+resource "azurerm_lb" "li_lb" {
+    resource_group_name = azurerm_resource_group.li_rg.name
+    name = "li-lb"
+    location = var.node_location
+    sku = "standard"
+    frontend_ip_configuration {
+        name = "front-ip"
+        public_ip_address_id = azurerm_public_ip.li_pip.id
+    }
+}
+resource "azurerm_lb_backend_address_pool" "li_back" {
+    resource_group_name = azurerm_resource_group.li_rg.name
+    loadbalancer_id = azurerm_lb.li_lb.id
+    name = "li-back"
+}
+resource"azurerm_lb_nat_rule" "tcp" {
+    count = var.node_count
+    resource_group_name = azurerm_resource_group.li_rg.name
+    loadbalancer_id = azurerm_lb.li_lb.id
+    name = "${var.resource_prefix}-${format("%02d",count.index)}"
+    protocol = "tcp"
+    frontend_port = "300${count.index+1}"
+    backend_port = 22
+    frontend_ip_configuration_name = "front-ip"
 }
