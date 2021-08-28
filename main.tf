@@ -80,13 +80,16 @@ resource "azurerm_virtual_machine" "li-vm" {
         disable_password_authentication = false
     }
 }
-
+## 퍼블릭 IP를 NIC에 넣어야 하는건가? 표준은Dynamic으로 설정 하면 안됨 Global 문제로 생성이 안되고 Regional로 됨
+## waiting for creation/update of Public Ip Address: (Name "LB-Pip" / Resource Group "linuxnode-RG"): Code="VipAllocationFailedWithVipRangeNotFound" Message="No matching VIP range. Please contact support for more details." Details=[]
 resource "azurerm_public_ip" "li_pip" {
     name = "LB-Pip"
-    location = var.node_location
     resource_group_name = azurerm_resource_group.li_rg.name
+    location = var.node_location
     allocation_method = "Static"
     sku = "standard"
+    sku_tier = "Regional"
+    availability_zone = "No-Zone"
 }
 
 resource "azurerm_lb" "li_lb" {
@@ -104,7 +107,13 @@ resource "azurerm_lb_backend_address_pool" "li_back" {
     loadbalancer_id = azurerm_lb.li_lb.id
     name = "li-back"
 }
-resource"azurerm_lb_nat_rule" "tcp" {
+resource "azurerm_network_interface_backend_address_pool_association" "li_backPooL" {
+    count = var.node_count
+    backend_address_pool_id = azurerm_lb_backend_address_pool.li_back.id
+    ip_configuration_name = "internal"
+    network_interface_id = element(azurerm_network_interface.li_nic.*.id, count.index)
+}
+resource"azurerm_lb_nat_rule" "li_nat_rule" {
     count = var.node_count
     resource_group_name = azurerm_resource_group.li_rg.name
     loadbalancer_id = azurerm_lb.li_lb.id
@@ -114,3 +123,12 @@ resource"azurerm_lb_nat_rule" "tcp" {
     backend_port = 22
     frontend_ip_configuration_name = "front-ip"
 }
+resource "azurerm_network_interface_nat_rule_association" "li_natrule_association" {
+    count = var.node_count
+    network_interface_id = element(azurerm_network_interface.li_nic.*.id, count.index)
+    ip_configuration_name = "internal"
+    nat_rule_id = element(azurerm_lb_nat_rule.li_nat_rule.*.id, count.index)
+    
+}
+
+##A resource with the ID "/subscriptions/801d5b45-4c84-4353-a1ce-213384a016aa/resourceGroups/linuxnode-RG/providers/Microsoft.Network/publicIPAddresses/LB-Pip" already exists - to be managed via Terraform this resource needs to be imported into the State. Please see the resource documentation for "azurerm_public_ip" for more information.
