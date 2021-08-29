@@ -77,6 +77,7 @@ resource "azurerm_virtual_machine" "li-vm" {
     vm_size = "Standard_B1ms"
     delete_os_disk_on_termination = true
     storage_image_reference {
+        ## 커스텀 이미지의 리소스 ID 지정
         id = var.vhd_uri
     }
     storage_os_disk{
