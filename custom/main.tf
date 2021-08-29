@@ -33,13 +33,13 @@ resource "azurerm_network_interface" "li_nic" {
         private_ip_address_allocation = "Dynamic"
     }
 }
-## NSG 생성
+## NSG 생성 접속 22 , http 80포트 열음
 resource "azurerm_network_security_group" "li_nsg" {
     name = "${var.resource_prefix}-nsg"
     location = var.node_location
     resource_group_name = azurerm_resource_group.li_rg.name
     security_rule {
-        name = "Inbound"
+        name = "Inbound_ssh"
         priority = 100
         direction = "Inbound"
         access = "Allow"
@@ -49,6 +49,18 @@ resource "azurerm_network_security_group" "li_nsg" {
         source_address_prefix = "*"
         destination_address_prefix = "*"
     }
+    security_rule {
+        name = "Inbound_http"
+        priority = 110
+        direction = "Inbound"
+        access = "Allow"
+        protocol = "Tcp"
+        source_port_range = "*"
+        destination_port_range = "80"
+        source_address_prefix = "*"
+        destination_address_prefix = "*"
+    }
+
 }
 ## NSG 붙이기
 resource "azurerm_subnet_network_security_group_association" "li_subnet_nsg_association" {
@@ -62,13 +74,10 @@ resource "azurerm_virtual_machine" "li-vm" {
     location = var.node_location
     resource_group_name = azurerm_resource_group.li_rg.name
     network_interface_ids = [element(azurerm_network_interface.li_nic.*.id, count.index)]
-    vm_size = "Standard_B1s"
+    vm_size = "Standard_B1ms"
     delete_os_disk_on_termination = true
     storage_image_reference {
-        publisher = "Canonical"
-        offer = "UbuntuServer"
-        sku = "16.04-LTS"
-        version = "latest" 
+        id = var.vhd_uri
     }
     storage_os_disk{
         name = "lidisk-${count.index}"
@@ -77,7 +86,7 @@ resource "azurerm_virtual_machine" "li-vm" {
         managed_disk_type = "Standard_LRS"
     }
     os_profile{
-        computer_name = "lidd"
+        computer_name = "ubuntuApache"
         admin_username = "AzureUser"
         admin_password = "Eogksalsrnr1!"
     }

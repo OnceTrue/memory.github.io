@@ -13,3 +13,6 @@ variable "node_address_prefix"{
 variable "node_count" {
     type = number
 }
+variable "vhd_uri" {
+    type = string
+}
