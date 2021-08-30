@@ -87,7 +87,8 @@ resource "azurerm_virtual_machine" "li-vm" {
         managed_disk_type = "Standard_LRS"
     }
     os_profile{
-        computer_name = "ubuntuApache"
+        #컴퓨터 이름 붙이기
+        computer_name = "${var.resource_prefix}-${format("%02d",count.index)}"
         admin_username = "AzureUser"
         admin_password = "Eogksalsrnr1!"
     }
@@ -149,6 +150,10 @@ resource "azurerm_network_interface_nat_rule_association" "li_natrule_associatio
     ip_configuration_name = "internal"
     nat_rule_id = element(azurerm_lb_nat_rule.li_nat_rule.*.id, count.index)
     
+}
+## 공인 IP 보기
+output "PublicIP" {
+  value = azurerm_public_ip.li_pip.ip_address
 }
 
 ##A resource with the ID "/subscriptions/801d5b45-4c84-4353-a1ce-213384a016aa/resourceGroups/linuxnode-RG/providers/Microsoft.Network/publicIPAddresses/LB-Pip" already exists - to be managed via Terraform this resource needs to be imported into the State. Please see the resource documentation for "azurerm_public_ip" for more information.
