@@ -137,9 +137,9 @@ resource"azurerm_lb_nat_rule" "li_nat_rule" {
     count = var.node_count
     resource_group_name = azurerm_resource_group.li_rg.name
     loadbalancer_id = azurerm_lb.li_lb.id
-    name = "${var.resource_prefix}-${format("%02d",count.index)}"
+    name = "${var.resource_prefix}-${format("%03d",count.index)}"
     protocol = "tcp"
-    frontend_port = "300${count.index+1}"
+    frontend_port = "3${count.index}"
     backend_port = 22
     frontend_ip_configuration_name = "front-ip"
 }
