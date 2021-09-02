@@ -15,6 +15,7 @@ var subnetName = 'wc-sub'
 var publicipAddressName = 'wc-pip'
 var diagStorageAccountName = 'diags${uniqueString(resourceGroup().id)}'
 var networkSecurityGroupName = 'wc-nsg'
+var loadname = 'wclb'
 
 //가상머신 생성
 resource vm 'Microsoft.Compute/virtualMachines@2021-04-01'= {
@@ -146,5 +147,27 @@ resource wcpip 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
   location: location
   properties: {
     publicIPAllocationMethod:'Dynamic'
+  }
+}
+resource wclb 'Microsoft.Network/loadBalancers@2021-02-01' ={
+  name: loadname
+  location:location
+  sku: {
+    name:'Standard'
+    tier: 'Regional'
+  }
+  properties:{
+    backendAddressPools:[
+      {
+        name: 'wc-back'
+        properties:{
+          loadBalancerBackendAddresses:[
+            {
+              name:
+            }
+          ]
+        }
+      }
+    ]
   }
 }
