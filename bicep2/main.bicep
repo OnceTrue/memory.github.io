@@ -157,8 +157,20 @@ resource wclb 'Microsoft.Network/loadBalancers@2021-02-01' ={
     tier: 'Regional'
   }
   properties:{
-    backendAddressPools:[
+    frontendIPConfigurations: [
       {
+        name: wcpip
+        properties: {
+         privateIPAllocationMethod: 'Dynamic'
+         subnet: {
+           id: vnet.id
+         }
+        }
+      }
+    ]
+    backendAddressPools:[
+      { 
+        id: 
         name: 'wc-back'
         properties:{
           loadBalancerBackendAddresses:[
