@@ -130,7 +130,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "li_backPo
     count = var.node_count
     backend_address_pool_id = azurerm_lb_backend_address_pool.li_back.id
     ip_configuration_name = "internal"
-    network_interface_id = [element(azurerm_network_interface.li_nic.*.id, count.index)]
+    network_interface_id = element(azurerm_network_interface.li_nic.*.id, count.index)
 }
 ## 로드밸런서 nat 룰 생성
 resource"azurerm_lb_nat_rule" "li_nat_rule" {
@@ -139,16 +139,16 @@ resource"azurerm_lb_nat_rule" "li_nat_rule" {
     loadbalancer_id = azurerm_lb.li_lb.id
     name = "0${format("%03d",count.index)}"
     protocol = "tcp"
-    frontend_port = "0${format("%03d",count.index)}}"
+    frontend_port = "5${format("%03d",count.index)}"
     backend_port = 22
     frontend_ip_configuration_name = "front-ip"
 }
 ## nat룰에 네트워크인터페이스, 가상머신 붙이기
 resource "azurerm_network_interface_nat_rule_association" "li_natrule_association" {
     count = var.node_count
-    network_interface_id = [element(azurerm_network_interface.li_nic.*.id, count.index)]
+    network_interface_id = element(azurerm_network_interface.li_nic.*.id, count.index)
     ip_configuration_name = "internal"
-    nat_rule_id = [element(azurerm_lb_nat_rule.li_nat_rule.*.id, count.index)]
+    nat_rule_id = element(azurerm_lb_nat_rule.li_nat_rule.*.id, count.index)
 }
 ## 공인 IP 보기
 output "PublicIP" {
