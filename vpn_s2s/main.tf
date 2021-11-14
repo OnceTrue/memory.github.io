@@ -49,14 +49,7 @@ resource "azurerm_virtual_network_gateway" "VPN" {
   active_active = false
   enable_bgp    = false
   sku           = "VpnGw1"
-  Dynamic "ipsec_policy" {
-      dh_group = "DHGroup2048"
-      ike_encryption = "GCMAES128"
-      ike_integrity = "SHA256"
-      ipsec_encryption = "GCMAES128"
-      ipsec_integrity = "SHA256"
-      pfs_group = "PFS2048"
-  }
+ 
   ip_configuration {
     public_ip_address_id          = azurerm_public_ip.VPN_Pip.id
     private_ip_address_allocation = "Dynamic"
@@ -72,6 +65,13 @@ resource "azurerm_virtual_network_gateway_connection" "Connect" {
   type                       = "IPsec"
   virtual_network_gateway_id = azurerm_virtual_network_gateway.VPN.id
   local_network_gateway_id   = azurerm_local_network_gateway.To_Onpremise.id
-  
+   Dynamic "ipsec_policy" {
+      dh_group = "DHGroup2048"
+      ike_encryption = "GCMAES128"
+      ike_integrity = "SHA256"
+      ipsec_encryption = "GCMAES128"
+      ipsec_integrity = "SHA256"
+      pfs_group = "PFS2048"
+  }
   shared_key = "ftwIi+q8FVX3A+2IswU7TfRBVbgYZGQ3Xm/1sOBE6YA="
 }
