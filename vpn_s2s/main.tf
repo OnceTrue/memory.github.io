@@ -87,6 +87,7 @@ resource "azurerm_virtual_network_gateway_connection" "Connect" {
       ipsec_integrity = "SHA256"
       pfs_group = "PFS2048"
       sa_lifetime = "28800"
+      sa_datasize = "102400000"
   }
   shared_key = "ftwIi+q8FVX3A+2IswU7TfRBVbgYZGQ3Xm/1sOBE6YA="
 }
