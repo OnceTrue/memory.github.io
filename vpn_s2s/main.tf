@@ -1,3 +1,16 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "=2.46.0"
+    }
+  }
+}
+
+# Configure the Microsoft Azure Provider
+provider "azurerm" {
+  features {}
+}
 resource "azurerm_resource_group" "RG" {
   name     = "${var.resource_prefix}-RG"
   location = var.location
@@ -8,14 +21,19 @@ resource "azurerm_virtual_network" "Vnet" {
   location            = azurerm_resource_group.RG.location
   resource_group_name = azurerm_resource_group.RG.name
   address_space       = var.Subnet_ip_address
-
-resource "azurerm_subnet" "Subnet" {
-  name                 = "VPNGatewaySubnet"
+}
+resource "azurerm_subnet" "VSubnet" {
+  name                 = "GatewaySubnet"
   resource_group_name  = azurerm_resource_group.RG.name
   virtual_network_name = azurerm_virtual_network.Vnet.name
   address_prefixes     = ["40.10.0.0/27"]
 }
-
+resource "azurerm_subnet" "VSubnet2" {
+  name                 = "etc"
+  resource_group_name  = azurerm_resource_group.RG.name
+  virtual_network_name = azurerm_virtual_network.Vnet.name
+  address_prefixes     = ["40.10.1.0/24"]
+}
 resource "azurerm_local_network_gateway" "To_Onpremise" {
   name                = "To_onpremise"
   location            = azurerm_resource_group.RG.location
@@ -32,18 +50,14 @@ resource "azurerm_public_ip" "VPN_Pip" {
   name                = "VPN_Pip"
   location            = azurerm_resource_group.RG.location
   resource_group_name = azurerm_resource_group.RG.name
-  allocation_method = "Static"
-  allocation_method   = "standard"
-  sku_tier = "Regional"
-  availability_zone = "No-Zone"
+  allocation_method = "Dynamic"
 }
 
 resource "azurerm_virtual_network_gateway" "VPN" {
-  name                = "wocVPN"
+  name                = "Woc_VPN"
   location            = azurerm_resource_group.RG.location
   resource_group_name = azurerm_resource_group.RG.name
-
-  type     = "IPSec"
+  type     = "VPN"
   vpn_type = "RouteBased"
 
   active_active = false
@@ -53,7 +67,7 @@ resource "azurerm_virtual_network_gateway" "VPN" {
   ip_configuration {
     public_ip_address_id          = azurerm_public_ip.VPN_Pip.id
     private_ip_address_allocation = "Dynamic"
-    subnet_id                     = azurerm_subnet.Subnet.id
+    subnet_id                     = azurerm_subnet.VSubnet.id
   }
 }
 
@@ -65,11 +79,11 @@ resource "azurerm_virtual_network_gateway_connection" "Connect" {
   type                       = "IPsec"
   virtual_network_gateway_id = azurerm_virtual_network_gateway.VPN.id
   local_network_gateway_id   = azurerm_local_network_gateway.To_Onpremise.id
-   Dynamic "ipsec_policy" {
+   ipsec_policy {
       dh_group = "DHGroup2048"
-      ike_encryption = "GCMAES128"
+      ike_encryption = "AES128"
       ike_integrity = "SHA256"
-      ipsec_encryption = "GCMAES128"
+      ipsec_encryption = "AES128"
       ipsec_integrity = "SHA256"
       pfs_group = "PFS2048"
   }
