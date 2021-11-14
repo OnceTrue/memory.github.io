@@ -44,6 +44,7 @@ resource "azurerm_subnet_network_security_group_association" "li_subnet_nsg_asso
 resource "azurerm_virtual_machine" "li-vm" {
     count = var.node_count
     name = "0${format("%03d",count.index)}"
+    #{count.index+1}를 하면 숫자를 이 후로 설정 할 수 있음
     location = var.node_location
     resource_group_name = azurerm_resource_group.li_rg.name
     network_interface_ids = [element(azurerm_network_interface.li_nic.*.id, count.index)]
