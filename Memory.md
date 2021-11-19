@@ -85,5 +85,29 @@ Azure Cloude Shell 생성(여기서는 Bash로 생성)
 ![image](https://user-images.githubusercontent.com/85273192/121159463-2bbe5980-c886-11eb-98dd-14967af36377.png)
 
 
+추가로 로컬로 terraform 하기
+아래 링크로 이동하여 사양에 맞는 파일을 다운로드 받음
+https://www.terraform.io/downloads.html
 
+압축을 풀고 특정 폴더에 terraform.exe파일을 넣음
+![image](https://user-images.githubusercontent.com/85273192/142516791-3ce88c72-4d19-4ed1-ab6f-9898f2581a3a.png)
+
+넣고 실행창에 다음을 입력 함
+sysdm.cpl ,3
+![image](https://user-images.githubusercontent.com/85273192/142516930-d3e59f45-4639-44a1-be70-4be6ff18afa5.png)
+환경변수 클릭
+
+![image](https://user-images.githubusercontent.com/85273192/142516981-aa53097f-fa9a-48b8-aa1c-272472ce39bc.png)
+
+path 클릭 -> 편집 클릭
+![image](https://user-images.githubusercontent.com/85273192/142517049-cff174f0-1c05-4f4b-9ad8-c022e98d8ec6.png)
+새로만들기 클릭 -> terraform.exe파일을 추가 함
+![image](https://user-images.githubusercontent.com/85273192/142517115-e3aa2a80-0860-4a9d-8307-804deadff904.png)
+확인 및 적용 클릭
+이 후 cmd 창으로 오면 "terraform"으로 입력시 
+다음과 같이 나옴
+![image](https://user-images.githubusercontent.com/85273192/142517257-b5ae585b-9e39-4c15-9765-6fa4e8ce16bc.png)
+
+"terraform version" 입력시 다음과 같이 나옴
+![image](https://user-images.githubusercontent.com/85273192/142517315-38a92ae6-4837-4b19-a49c-fcd541355594.png)
 
